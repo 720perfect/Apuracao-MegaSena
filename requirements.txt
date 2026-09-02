@@ -1,0 +1,19 @@
+# Dependências do Projeto Apuração Mega-Sena
+
+# Requisições HTTP e consumo da API de Loterias
+requests>=2.31.0
+urllib3>=2.0.0
+
+# Parsing e raspagem de dados (caso necessário)
+beautifulsoup4>=4.12.0
+lxml>=5.1.0
+
+# Processamento e análise de dados dos sorteios
+pandas>=2.1.0
+
+# Utilitários e variáveis de ambiente
+python-dotenv>=1.0.0
+
+# Testes unitários (executados no workflow de CI/CD)
+pytest>=8.0.0
+pytest-cov>=4.1.0
