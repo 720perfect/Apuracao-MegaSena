@@ -1,0 +1,49 @@
+name: Python CI Pipeline
+
+# 1. GATILHOS (on)
+# O workflow sera executado automaticamente a cada push ou Pull Request na branch main
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    # 2. AMBIENTE DE EXECUÇÃO (runs-on)
+    # Define o sistema operacional do container runner do GitHub
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        # Testa o codigo em multiplas versoes do Python simultaneamente
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+    # 3. ACTIONS REUTILIZÁVEIS (uses)
+    - name: Baixar o codigo do repositorio
+      uses: actions/checkout@v4
+
+    - name: Configurar o ambiente Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip' # Otimiza execuções futuras salvando em cache as dependencias
+
+    # 4. COMANDOS (run)
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install flake8 pytest
+
+    - name: Analise estatica de codigo (Linter)
+      run: |
+        # Para a execução se houver erros de sintaxe ou variaveis nao definidas
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Aviso para estilo de codigo (pep8)
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Executar testes unitarios
+      run: |
+        pytest
